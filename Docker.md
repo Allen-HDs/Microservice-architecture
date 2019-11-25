@@ -1763,3 +1763,739 @@ FROM my-node
 - [Dockerfie 官方文档](https://docs.docker.com/engine/reference/builder/)
 - [Dockerfile 最佳实践文档](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/)
 - [Docker 官方镜像 Dockerfile](https://github.com/docker-library/docs)
+
+# 五、Docker容器
+
+## 1.Docker 启动容器
+
+启动容器有两种方式，一种是基于镜像新建一个容器并启动，另外一个是将在终止状态（`stopped`）的容器重新启动。
+
+因为 Docker 的容器实在太轻量级了，很多时候用户都是随时删除和新创建容器。
+
+- [ ] ### 新建并启动
+
+所需要的命令主要为 `docker run`。
+
+例如，下面的命令输出一个 “Hello World”，之后终止容器。
+
+```shell
+$ docker run ubuntu:14.04 /bin/echo 'Hello world'
+Hello world
+
+```
+
+这跟在本地直接执行 `/bin/echo 'hello world'` 几乎感觉不出任何区别。
+
+下面的命令则启动一个 bash 终端，允许用户进行交互。
+
+```shell
+$ docker run -t -i ubuntu:14.04 /bin/bash
+root@af8bae53bdd3:/#
+
+```
+
+其中，`-t` 选项让Docker分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上， `-i` 则让容器的标准输入保持打开。
+
+在交互模式下，用户可以通过所创建的终端来输入命令，例如
+
+```shell
+root@af8bae53bdd3:/# pwd
+/
+root@af8bae53bdd3:/# ls
+bin boot dev etc home lib lib64 media mnt opt proc root run sbin srv sys tmp usr var
+
+```
+
+当利用 `docker run` 来创建容器时，Docker 在后台运行的标准操作包括：
+
+- 检查本地是否存在指定的镜像，不存在就从公有仓库下载
+- 利用镜像创建并启动一个容器
+- 分配一个文件系统，并在只读的镜像层外面挂载一层可读写层
+- 从宿主主机配置的网桥接口中桥接一个虚拟接口到容器中去
+- 从地址池配置一个 ip 地址给容器
+- 执行用户指定的应用程序
+- 执行完毕后容器被终止
+
+- [ ] ### 启动已终止容器
+
+可以利用 `docker container start` 命令，直接将一个已经终止的容器启动运行。
+
+容器的核心为所执行的应用程序，所需要的资源都是应用程序运行所必需的。除此之外，并没有其它的资源。可以在伪终端中利用 `ps` 或 `top` 来查看进程信息。
+
+```shell
+root@ba267838cc1b:/# ps
+  PID TTY          TIME CMD
+    1 ?        00:00:00 bash
+   11 ?        00:00:00 ps
+
+```
+
+可见，容器中仅运行了指定的 bash 应用。这种特点使得 Docker 对资源的利用率极高，是货真价实的轻量级虚拟化。
+
+## 2. Docker 守护态运行
+
+更多的时候，需要让 Docker 在后台运行而不是直接把执行命令的结果输出在当前宿主机下。此时，可以通过添加 `-d` 参数来实现。
+
+下面举两个例子来说明一下。
+
+如果不使用 `-d` 参数运行容器。
+
+```shell
+$ docker run ubuntu:17.10 /bin/sh -c "while true; do echo hello world; sleep 1; done"
+hello world
+hello world
+hello world
+hello world
+
+```
+
+容器会把输出的结果 (STDOUT) 打印到宿主机上面
+
+如果使用了 `-d` 参数运行容器。
+
+```shell
+$ docker run -d ubuntu:17.10 /bin/sh -c "while true; do echo hello world; sleep 1; done"
+77b2dc01fe0f3f1265df143181e7b9af5e05279a884f4776ee75350ea9d8017a
+
+```
+
+此时容器会在后台运行并不会把输出的结果 (STDOUT) 打印到宿主机上面(输出结果可以用 `docker logs`查看)。
+
+**注：** 容器是否会长久运行，是和 `docker run` 指定的命令有关，和 `-d` 参数无关。
+
+使用 `-d` 参数启动后会返回一个唯一的 id，也可以通过 `docker container ls` 命令来查看容器信息。
+
+```shell
+$ docker container ls
+CONTAINER ID  IMAGE         COMMAND               CREATED        STATUS       PORTS NAMES
+77b2dc01fe0f  ubuntu:17.10  /bin/sh -c 'while tr  2 minutes ago  Up 1 minute        agitated_wright
+
+```
+
+要获取容器的输出信息，可以通过 `docker container logs` 命令。
+
+```shellshell
+$ docker container logs [container ID or NAMES]
+hello world
+hello world
+hello world
+. . .
+```
+
+## 3. Docker 终止容器
+
+可以使用 `docker container stop` 来终止一个运行中的容器。
+
+此外，当 Docker 容器中指定的应用终结时，容器也自动终止。
+
+例如对于上一章节中只启动了一个终端的容器，用户通过 `exit` 命令或 `Ctrl+d` 来退出终端时，所创建的容器立刻终止。
+
+终止状态的容器可以用 `docker container ls -a` 命令看到。例如
+
+```shell
+docker container ls -a
+CONTAINER ID        IMAGE                    COMMAND                CREATED             STATUS                          PORTS               NAMES
+ba267838cc1b        ubuntu:14.04             "/bin/bash"            30 minutes ago      Exited (0) About a minute ago                       trusting_newton
+98e5efa7d997        training/webapp:latest   "python app.py"        About an hour ago   Exited (0) 34 minutes ago                           backstabbing_pike
+
+```
+
+处于终止状态的容器，可以通过 `docker container start` 命令来重新启动。
+
+此外，`docker container restart` 命令会将一个运行态的容器终止，然后再重新启动它。
+
+## 4.Docker 进入容器
+
+在使用 `-d` 参数时，容器启动后会进入后台。
+
+某些时候需要进入容器进行操作，包括使用 `docker attach` 命令或 `docker exec` 命令，推荐大家使用 `docker exec` 命令，原因会在下面说明。
+
+- [ ] ### `attach` 命令
+
+`docker attach` 是 Docker 自带的命令。下面示例如何使用该命令。
+
+```shell
+$ docker run -dit ubuntu
+243c32535da7d142fb0e6df616a3c3ada0b8ab417937c853a9e1c251f499f550
+
+$ docker container ls
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+243c32535da7        ubuntu:latest       "/bin/bash"         18 seconds ago      Up 17 seconds                           nostalgic_hypatia
+
+$ docker attach 243c
+root@243c32535da7:/#
+
+```
+
+*注意：* 如果从这个 stdin 中 exit，会导致容器的停止。
+
+- [ ] ### `exec` 命令
+
+- ### -i -t 参数
+
+`docker exec` 后边可以跟多个参数，这里主要说明 `-i` `-t` 参数。
+
+只用 `-i` 参数时，由于没有分配伪终端，界面没有我们熟悉的 Linux 命令提示符，但命令执行结果仍然可以返回。
+
+当 `-i` `-t` 参数一起使用时，则可以看到我们熟悉的 Linux 命令提示符。
+
+```shell
+$ docker run -dit ubuntu
+69d137adef7a8a689cbcb059e94da5489d3cddd240ff675c640c8d96e84fe1f6
+
+$ docker container ls
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+69d137adef7a        ubuntu:latest       "/bin/bash"         18 seconds ago      Up 17 seconds                           zealous_swirles
+
+$ docker exec -i 69d1 bash
+ls
+bin
+boot
+dev
+...
+
+$ docker exec -it 69d1 bash
+root@69d137adef7a:/#
+
+```
+
+如果从这个 stdin 中 exit，不会导致容器的停止。这就是为什么推荐大家使用 `docker exec` 的原因。
+
+更多参数说明请使用 `docker exec --help` 查看。
+
+## 5. Docker 导出和导入容器
+
+### 5.1 导出容器
+
+如果要导出本地某个容器，可以使用 `docker export` 命令。
+
+```shell
+$ docker container ls -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                    PORTS               NAMES
+7691a814370e        ubuntu:14.04        "/bin/bash"         36 hours ago        Exited (0) 21 hours ago                       test
+$ docker export 7691a814370e > ubuntu.tar
+
+```
+
+这样将导出容器快照到本地文件。
+
+### 5.2 导入容器快照
+
+可以使用 `docker import` 从容器快照文件中再导入为镜像，例如
+
+```shell
+$ cat ubuntu.tar | docker import - test/ubuntu:v1.0
+$ docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED              VIRTUAL SIZE
+test/ubuntu         v1.0                9d37a6082e97        About a minute ago   171.3 MB
+
+```
+
+此外，也可以通过指定 URL 或者某个目录来导入，例如
+
+```shell
+$ docker import http://example.com/exampleimage.tgz example/imagerepo
+
+```
+
+*注：用户既可以使用 docker load 来导入镜像存储文件到本地镜像库，也可以使用 docker import 来导入一个容器快照到本地镜像库。这两者的区别在于容器快照文件将丢弃所有的历史记录和元数据信息（即仅保存容器当时的快照状态），而镜像存储文件将保存完整记录，体积也要大。此外，从容器快照文件导入时可以重新指定标签等元数据信息。*
+
+## 6.Docker 删除容器
+
+可以使用 `docker container rm` 来删除一个处于终止状态的容器。例如
+
+```shell 
+$ docker container rm  trusting_newton
+trusting_newton
+
+```
+
+如果要删除一个运行中的容器，可以添加 `-f` 参数。Docker 会发送 `SIGKILL` 信号给容器。
+
+### 6.1 清理所有处于终止状态的容器
+
+用 `docker container ls -a` 命令可以查看所有已经创建的包括终止状态的容器，如果数量太多要一个个删除可能会很麻烦，用下面的命令可以清理掉所有处于终止状态的容器。
+
+```shell
+$ docker container prune
+```
+
+# 六、Docker 仓库
+
+## 1.访问Docker仓库
+
+仓库（`Repository`）是集中存放镜像的地方。
+
+一个容易混淆的概念是注册服务器（`Registry`）。实际上注册服务器是管理仓库的具体服务器，每个服务器上可以有多个仓库，而每个仓库下面有多个镜像。从这方面来说，仓库可以被认为是一个具体的项目或目录。例如对于仓库地址 `dl.dockerpool.com/ubuntu` 来说，`dl.dockerpool.com` 是注册服务器地址，`ubuntu` 是仓库名。
+
+大部分时候，并不需要严格区分这两者的概念。
+
+## 2.Docker Hub
+
+目前 Docker 官方维护了一个公共仓库 [Docker Hub](https://hub.docker.com/)，其中已经包括了数量超过 15,000 的镜像。大部分需求都可以通过在 Docker Hub 中直接下载镜像来实现。
+
+### 2.1 注册
+
+你可以在 https://cloud.docker.com 免费注册一个 Docker 账号。
+
+### 2.2 登录
+
+可以通过执行 `docker login` 命令交互式的输入用户名及密码来完成在命令行界面登录 Docker Hub。
+
+你可以通过 `docker logout` 退出登录。
+
+### 2.3 拉取镜像
+
+你可以通过 `docker search` 命令来查找官方仓库中的镜像，并利用 `docker pull` 命令来将它下载到本地。
+
+例如以 `centos` 为关键词进行搜索：
+
+```shell
+$ docker search centos
+NAME                                            DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
+centos                                          The official build of CentOS.                   465       [OK]
+tianon/centos                                   CentOS 5 and 6, created using rinse instea...   28
+blalor/centos                                   Bare-bones base CentOS 6.5 image                6                    [OK]
+saltstack/centos-6-minimal                                                                      6                    [OK]
+tutum/centos-6.4                                DEPRECATED. Use tutum/centos:6.4 instead. ...   5                    [OK]
+
+```
+
+可以看到返回了很多包含关键字的镜像，其中包括镜像名字、描述、收藏数（表示该镜像的受关注程度）、是否官方创建、是否自动创建。
+
+官方的镜像说明是官方项目组创建和维护的，automated 资源允许用户验证镜像的来源和内容。
+
+根据是否是官方提供，可将镜像资源分为两类。
+
+一种是类似 `centos` 这样的镜像，被称为基础镜像或根镜像。这些基础镜像由 Docker 公司创建、验证、支持、提供。这样的镜像往往使用单个单词作为名字。
+
+还有一种类型，比如 `tianon/centos` 镜像，它是由 Docker 的用户创建并维护的，往往带有用户名称前缀。可以通过前缀 `username/` 来指定使用某个用户提供的镜像，比如 tianon 用户。
+
+另外，在查找的时候通过 `--filter=stars=N` 参数可以指定仅显示收藏数量为 `N` 以上的镜像。
+
+下载官方 `centos` 镜像到本地。
+
+```shell
+$ docker pull centos
+Pulling repository centos
+0b443ba03958: Download complete
+539c0211cd76: Download complete
+511136ea3c5a: Download complete
+7064731afe90: Download complete
+
+```
+
+### 2.4 推送镜像
+
+用户也可以在登录后通过 `docker push` 命令来将自己的镜像推送到 Docker Hub。
+
+以下命令中的 `username` 请替换为你的 Docker 账号用户名。
+
+```shell
+$ docker tag ubuntu:17.10 username/ubuntu:17.10
+
+$ docker image ls
+
+REPOSITORY                                               TAG                    IMAGE ID            CREATED             SIZE
+ubuntu                                                   17.10                  275d79972a86        6 days ago          94.6MB
+username/ubuntu                                          17.10                  275d79972a86        6 days ago          94.6MB
+
+$ docker push username/ubuntu:17.10
+
+$ docker search username
+
+NAME                      DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED
+username/ubuntu
+
+```
+
+### 2.5 自动创建
+
+自动创建（Automated Builds）功能对于需要经常升级镜像内程序来说，十分方便。
+
+有时候，用户创建了镜像，安装了某个软件，如果软件发布新版本则需要手动更新镜像。
+
+而自动创建允许用户通过 Docker Hub 指定跟踪一个目标网站（目前支持 [GitHub](https://github.com/) 或 [BitBucket](https://bitbucket.org/)）上的项目，一旦项目发生新的提交或者创建新的标签（tag），Docker Hub 会自动构建镜像并推送到 Docker Hub 中。
+
+要配置自动创建，包括如下的步骤：
+
+- 创建并登录 Docker Hub，以及目标网站；
+- 在目标网站中连接帐户到 Docker Hub；
+- 在 Docker Hub 中 [配置一个自动创建](https://registry.hub.docker.com/builds/add/)；
+- 选取一个目标网站中的项目（需要含 `Dockerfile`）和分支；
+- 指定 `Dockerfile` 的位置，并提交创建。
+
+之后，可以在 Docker Hub 的 [自动创建页面](https://registry.hub.docker.com/builds/) 中跟踪每次创建的状态。
+
+## 3.Docker 私有库
+
+有时候使用 Docker Hub 这样的公共仓库可能不方便，用户可以创建一个本地仓库供私人使用。
+
+本节介绍如何使用本地仓库。
+
+[`docker-registry`](https://docs.docker.com/registry/) 是官方提供的工具，可以用于构建私有的镜像仓库。本文内容基于 [`docker-registry`](https://github.com/docker/distribution) v2.x 版本。
+
+### 3.1 安装运行 docker-registry
+
+- ### 容器运行
+
+可以通过获取官方 `registry` 镜像来运行。
+
+```shell
+$ docker run -d -p 5000:5000 --restart=always --name registry registry
+```
+
+这将使用官方的 `registry` 镜像来启动私有仓库。默认情况下，仓库会被创建在容器的 `/var/lib/registry` 目录下。你可以通过 `-v` 参数来将镜像文件存放在本地的指定路径。例如下面的例子将上传的镜像放到本地的 `/opt/data/registry` 目录。
+
+```shell
+$ docker run -d \
+    -p 5000:5000 \
+    -v /opt/data/registry:/var/lib/registry \
+    registry
+```
+
+### 3.2 在私有仓库上传、搜索、下载镜像
+
+创建好私有仓库之后，就可以使用 `docker tag` 来标记一个镜像，然后推送它到仓库。例如私有仓库地址为 `127.0.0.1:5000`。
+
+先在本机查看已有的镜像。
+
+```shell
+$ docker image ls
+REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+ubuntu          
+```
+
+使用 `docker tag` 将 `ubuntu:latest` 这个镜像标记为 `127.0.0.1:5000/ubuntu:latest`。
+
+格式为 `docker tag IMAGE[:TAG] [REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG]`。
+
+```shell
+$ docker tag ubuntu:latest 127.0.0.1:5000/ubuntu:latest
+$ docker image ls
+REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+ubuntu                            latest              ba5877dc9bec        6 weeks ago         192.7 MB
+127.0.0.1:5000/ubuntu:latest      latest              ba5877dc9bec        6 weeks ago  
+```
+
+使用 `docker push` 上传标记的镜像。
+
+```shell
+$ docker push 127.0.0.1:5000/ubuntu:latest
+The push refers to repository [127.0.0.1:5000/ubuntu]
+373a30c24545: Pushed
+a9148f5200b0: Pushed
+cdd3de0940ab: Pushed
+fc56279bbb33: Pushed
+b38367233d37: Pushed
+2aebd096e0e2: Pushed
+latest: digest: sha256:fe4277621f10b5026266932ddf760f5a756d2facd505a94d2da12f4f52f71f5a size: 1568
+```
+
+用 `curl` 查看仓库中的镜像。
+
+```shell
+$ curl 127.0.0.1:5000/v2/_catalog
+{"repositories":["ubuntu"]}
+```
+
+这里可以看到 `{"repositories":["ubuntu"]}`，表明镜像已经被成功上传了。
+
+先删除已有镜像，再尝试从私有仓库中下载这个镜像。
+
+```shell
+$ docker image rm 127.0.0.1:5000/ubuntu:latest
+
+$ docker pull 127.0.0.1:5000/ubuntu:latest
+Pulling repository 127.0.0.1:5000/ubuntu:latest
+ba5877dc9bec: Download complete
+511136ea3c5a: Download complete
+9bad880da3d2: Download complete
+25f11f5fb0cb: Download complete
+ebc34468f71d: Download complete
+2318d26665ef: Download complete
+
+$ docker image ls
+REPOSITORY                         TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+127.0.0.1:5000/ubuntu:latest       latest              ba5877dc9bec        6 weeks ago         192.7 MB
+```
+
+### 3.3 注意事项
+
+如果你不想使用 `127.0.0.1:5000` 作为仓库地址，比如想让本网段的其他主机也能把镜像推送到私有仓库。你就得把例如 `192.168.199.100:5000` 这样的内网地址作为私有仓库地址，这时你会发现无法成功推送镜像。
+
+这是因为 Docker 默认不允许非 `HTTPS` 方式推送镜像。我们可以通过 Docker 的配置选项来取消这个限制，或者查看下一节配置能够通过 `HTTPS` 访问的私有仓库。
+
+- #### Ubuntu 16.04+, Debian 8+, centos 7
+
+对于使用 `systemd` 的系统，请在 `/etc/docker/daemon.json` 中写入如下内容（如果文件不存在请新建该文件）
+
+```shell
+{
+  "registry-mirrors": [
+    "https://registry.docker-cn.com"
+  ],
+  "insecure-registries": [
+    "192.168.199.100:5000"
+  ]
+}
+
+```
+
+> 注意：该文件必须符合 `json` 规范，否则 Docker 将不能启动。
+
+### 3.4 其他
+
+对于 Docker for Windows 、 Docker for Mac 在设置中编辑 `daemon.json` 增加和上边一样的字符串即可。
+
+# 七、Docker实战
+
+## 1.Docker 数据卷
+
+`数据卷` 是一个可供一个或多个容器使用的特殊目录，它绕过 UFS，可以提供很多有用的特性：
+
+- `数据卷` 可以在容器之间共享和重用
+- 对 `数据卷` 的修改会立马生效
+- 对 `数据卷` 的更新，不会影响镜像
+- `数据卷` 默认会一直存在，即使容器被删除
+
+> 注意：`数据卷` 的使用，类似于 Linux 下对目录或文件进行 mount，镜像中的被指定为挂载点的目录中的文件会隐藏掉，能显示看的是挂载的 `数据卷`。
+
+### 1.1 选择 -v 还是 -–mount 参数
+
+Docker 新用户应该选择 `--mount` 参数，经验丰富的 Docker 使用者对 `-v` 或者 `--volume` 已经很熟悉了，但是推荐使用 `--mount` 参数。
+
+### 1.2 创建一个数据卷
+
+```shell
+$ docker volume create my-vol
+
+```
+
+查看所有的 `数据卷`
+
+```shell
+$ docker volume ls
+
+local               my-vol
+
+```
+
+在主机里使用以下命令可以查看指定 `数据卷` 的信息
+
+```shell
+$ docker volume inspect my-vol
+[
+    {
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/my-vol/_data",
+        "Name": "my-vol",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+
+```
+
+### 1.3 启动一个挂载数据卷的容器
+
+在用 `docker run` 命令的时候，使用 `--mount` 标记来将 `数据卷` 挂载到容器里。在一次 `docker run`中可以挂载多个 `数据卷`。
+
+下面创建一个名为 `web` 的容器，并加载一个 `数据卷` 到容器的 `/webapp` 目录。
+
+```shell
+$ docker run -d -P \
+    --name web \
+    # -v my-vol:/wepapp \
+    --mount source=my-vol,target=/webapp \
+    training/webapp \
+    python app.py
+
+```
+
+### 1.4 查看数据卷的具体信息
+
+在主机里使用以下命令可以查看 `web` 容器的信息
+
+```shell
+$ docker inspect web
+
+```
+
+`数据卷` 信息在 "Mounts" Key 下面
+
+```shell
+"Mounts": [
+    {
+        "Type": "volume",
+        "Name": "my-vol",
+        "Source": "/var/lib/docker/volumes/my-vol/_data",
+        "Destination": "/app",
+        "Driver": "local",
+        "Mode": "",
+        "RW": true,
+        "Propagation": ""
+    }
+],
+
+```
+
+### 1.5 删除数据卷
+
+```shell
+$ docker volume rm my-vol
+
+```
+
+`数据卷` 是被设计用来持久化数据的，它的生命周期独立于容器，Docker 不会在容器被删除后自动删除 `数据卷`，并且也不存在垃圾回收这样的机制来处理没有任何容器引用的 `数据卷`。如果需要在删除容器的同时移除数据卷。可以在删除容器的时候使用 `docker rm -v` 这个命令。
+
+无主的数据卷可能会占据很多空间，要清理请使用以下命令
+
+```shell
+$ docker volume prune
+```
+
+##  2.Docker 构建 Tomcat
+
+### 2.1 查找 Docker Hub 上的 Tomcat 镜像
+
+```shell
+root@UbuntuBase:/usr/local/docker/tomcat# docker search tomcat
+NAME                           DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED
+tomcat                         Apache Tomcat is an open source implementa...   1550                [OK]                
+dordoka/tomcat                 Ubuntu 14.04, Oracle JDK 8 and Tomcat 8 ba...   43                                      [OK]
+tomee                          Apache TomEE is an all-Apache Java EE cert...   42                  [OK]                
+davidcaste/alpine-tomcat       Apache Tomcat 7/8 using Oracle Java 7/8 wi...   21                                      [OK]
+consol/tomcat-7.0              Tomcat 7.0.57, 8080, "admin/admin"              16                                      [OK]
+cloudesire/tomcat              Tomcat server, 6/7/8                            15                                      [OK]
+maluuba/tomcat7                                                                9                                       [OK]
+tutum/tomcat                   Base docker image to run a Tomcat applicat...   8                                       
+jeanblanchard/tomcat           Minimal Docker image with Apache Tomcat         8                                       
+andreptb/tomcat                Debian Jessie based image with Apache Tomc...   7                                       [OK]
+bitnami/tomcat                 Bitnami Tomcat Docker Image                     5                                       [OK]
+aallam/tomcat-mysql            Debian, Oracle JDK, Tomcat & MySQL              4                                       [OK]
+antoineco/tomcat-mod_cluster   Apache Tomcat with JBoss mod_cluster            1                                       [OK]
+maluuba/tomcat7-java8          Tomcat7 with java8.                             1                                       
+amd64/tomcat                   Apache Tomcat is an open source implementa...   1                                       
+primetoninc/tomcat             Apache tomcat 8.5, 8.0, 7.0                     1                                       [OK]
+trollin/tomcat                                                                 0                                       
+fabric8/tomcat-8               Fabric8 Tomcat 8 Image                          0                                       [OK]
+awscory/tomcat                 tomcat                                          0                                       
+oobsri/tomcat8                 Testing CI Jobs with different names.           0                                       
+hegand/tomcat                  docker-tomcat                                   0                                       [OK]
+s390x/tomcat                   Apache Tomcat is an open source implementa...   0                                       
+ppc64le/tomcat                 Apache Tomcat is an open source implementa...   0                                       
+99taxis/tomcat7                Tomcat7                                         0                                       [OK]
+qminderapp/tomcat7             Tomcat 7                                        0
+
+```
+
+这里我们拉取官方的镜像
+
+```shell
+docker pull tomcat
+
+```
+
+等待下载完成后，我们就可以在本地镜像列表里查到 REPOSITORY 为 tomcat 的镜像。
+
+### 2.2 运行容器：
+
+```shell
+docker run --name tomcat -p 8080:8080 -v $PWD/test:/usr/local/tomcat/webapps/test -d tomcat
+
+```
+
+命令说明：
+
+- -p 8080:8080：将容器的8080端口映射到主机的8080端口
+- -v $PWD/test:/usr/local/tomcat/webapps/test：将主机中当前目录下的test挂载到容器的/test
+
+查看容器启动情况
+
+```shell
+root@UbuntuBase:/usr/local/docker/tomcat/webapps# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                    NAMES
+38498e53128c        tomcat              "catalina.sh run"   2 minutes ago       Up 2 minutes        0.0.0.0:8080->8080/tcp   tomcat
+
+```
+
+通过浏览器访问
+
+![img](https://www.funtl.com/assets/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20171103174843.png)
+
+## 3. Docker 构建 MySQL
+
+### 3.1查找 Docker Hub 上的 MySQL 镜像
+
+```shell
+root@UbuntuBase:/usr/local/docker/mysql# docker search mysql
+NAME                                                   DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED
+mysql                                                  MySQL is a widely used, open-source relati...   5177                [OK]                
+mariadb                                                MariaDB is a community-developed fork of M...   1602                [OK]                
+mysql/mysql-server                                     Optimized MySQL Server Docker images. Crea...   361                                     [OK]
+percona                                                Percona Server is a fork of the MySQL rela...   298                 [OK]                
+hypriot/rpi-mysql                                      RPi-compatible Docker Image with Mysql          72                                      
+zabbix/zabbix-server-mysql                             Zabbix Server with MySQL database support       62                                      [OK]
+centurylink/mysql                                      Image containing mysql. Optimized to be li...   53                                      [OK]
+sameersbn/mysql                                                                                        48                                      [OK]
+zabbix/zabbix-web-nginx-mysql                          Zabbix frontend based on Nginx web-server ...   36                                      [OK]
+tutum/mysql                                            Base docker image to run a MySQL database ...   27                                      
+1and1internet/ubuntu-16-nginx-php-phpmyadmin-mysql-5   ubuntu-16-nginx-php-phpmyadmin-mysql-5          17                                      [OK]
+schickling/mysql-backup-s3                             Backup MySQL to S3 (supports periodic back...   16                                      [OK]
+centos/mysql-57-centos7                                MySQL 5.7 SQL database server                   15                                      
+linuxserver/mysql                                      A Mysql container, brought to you by Linux...   12                                      
+centos/mysql-56-centos7                                MySQL 5.6 SQL database server                   6                                       
+openshift/mysql-55-centos7                             DEPRECATED: A Centos7 based MySQL v5.5 ima...   6                                       
+frodenas/mysql                                         A Docker Image for MySQL                        3                                       [OK]
+dsteinkopf/backup-all-mysql                            backup all DBs in a mysql server                3                                       [OK]
+circleci/mysql                                         MySQL is a widely used, open-source relati...   2                                       
+cloudposse/mysql                                       Improved `mysql` service with support for ...   0                                       [OK]
+astronomerio/mysql-sink                                MySQL sink                                      0                                       [OK]
+ansibleplaybookbundle/rhscl-mysql-apb                  An APB which deploys RHSCL MySQL                0                                       [OK]
+cloudfoundry/cf-mysql-ci                               Image used in CI of cf-mysql-release            0                                       
+astronomerio/mysql-source                              MySQL source                                    0                                       [OK]
+jenkler/mysql                                          Docker Mysql package                            0                                       
+
+```
+
+这里我们拉取官方的镜像
+
+```shell
+docker pull mysql:5.7.28
+```
+
+等待下载完成后，我们就可以在本地镜像列表里查到 REPOSITORY 为 mysql 的镜像
+
+### 3.2 运行容器：
+
+```shell
+docker run -p 3306:3306 --name mysql \
+-v /usr/local/docker/mysql/conf:/etc/mysql \
+-v /usr/local/docker/mysql/logs:/var/log/mysql \
+-v /usr/local/docker/mysql/data:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=123456 \
+-d mysql:5.7.28
+```
+
+命令参数：
+
+- `-p 3306:3306`：将容器的3306端口映射到主机的3306端口
+- `-v /usr/local/docker/mysql/conf:/etc/mysql`：将主机当前目录下的 conf 挂载到容器的 /etc/mysql
+- `-v /usr/local/docker/mysql/logs:/var/log/mysql`：将主机当前目录下的 logs 目录挂载到容器的 /var/log/mysql
+- `-v /usr/local/docker/mysql/data:/var/lib/mysql`：将主机当前目录下的 data 目录挂载到容器的 /var/lib/mysql
+- `-e MYSQL\_ROOT\_PASSWORD=123456`：初始化root用户的密码
+
+查看容器启动情况
+
+```shell
+root@UbuntuBase:/usr/local/docker/mysql# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+bc49c9de4cdf        mysql:latest        "docker-entrypoint..."   4 minutes ago       Up 4 minutes        0.0.0.0:3306->3306/tcp   mysql
+
+```
+
+使用客户端工具连接 MySQL
+
+![img](https://www.funtl.com/assets/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20171103184144.png)
