@@ -320,7 +320,7 @@ $ sudo usermod -aG docker $USER
 
 退出当前终端并重新登录，进行如下测试。
 
-### 1.6. 测试 Docker 是否安装正确
+### 1.6. 测试 Docker 是否安装正确 
 
 ```shell
 $ docker run hello-world
@@ -1090,7 +1090,7 @@ RUN buildDeps='gcc libc6-dev make' \
 
 在 `Dockerfile` 文件所在目录执行：
 
-```dockerfile
+```shell
 $ docker build -t mytomcat .
 Sending build context to Docker daemon  2.048kB
 Step 1/4 : FROM tomcat
