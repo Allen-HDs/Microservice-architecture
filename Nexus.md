@@ -1,4 +1,4 @@
-# xNexus
+# Nexus
 
 ## 1.什么是 Nexus
 
