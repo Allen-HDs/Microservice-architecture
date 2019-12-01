@@ -385,7 +385,7 @@ services:
 输入命令：
 
 ```powershell
-$ ssh-keygen -t rsa -C "your_email@example.com"
+$ ssh-keygen -t rsa -C "yx_endeavor@163.com"
 
 ```
 
