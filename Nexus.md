@@ -127,12 +127,12 @@ Snapshot: 1.0.0-SNAPSHOT
   <repository>  
     <id>nexus-releases</id>  
     <name>Nexus Release Repository</name>  
-    <url>http://127.0.0.1:8081/repository/maven-releases/</url>  
+    <url>http://192.168.75.131:8088/repository/maven-releases/</url>  
   </repository>  
   <snapshotRepository>  
     <id>nexus-snapshots</id>  
     <name>Nexus Snapshot Repository</name>  
-    <url>http://127.0.0.1:8081/repository/maven-snapshots/</url>  
+    <url>http://192.168.75.131:8088/repository/maven-snapshots/</url>  
   </snapshotRepository>  
 </distributionManagement> 
 
