@@ -38,6 +38,40 @@ services:
 
 地址：http://ip:port/ 用户名：admin 密码：admin123
 
+查看默认密码：
+
+在搜索服务器上admin.password文件在哪
+
+因为是docker安装的所以要从docker进入容器里边
+
+```shell
+`#查询容器id``docker ps` `#进入容器里面``docker exec -it 容器id bash`
+```
+
+ 找到admin.password文件，默认位置在
+
+/opt/sonatype/sonatype-work/sonatype-work/nexus3/admin.password
+
+![img](https://img2018.cnblogs.com/blog/1697935/201907/1697935-20190708233447559-1363949102.png)
+
+
+
+步骤九：查看密码
+
+```
+`vi admin.password`
+```
+
+　　![img](https://img2018.cnblogs.com/blog/1697935/201907/1697935-20190708233415295-859023067.png)
+
+ 
+
+注意：登录密码就是这么一大长传的字符串！！！，这不是加密的，当初以为这是加密的，还各种找资料要解密
+
+ 
+
+步骤十：复制密码直接登录nexus，登录成功！！！
+
 ![img](https://www.funtl.com/assets/Lusifer1521047001.png)
 
 ## 3.Maven 仓库介绍
@@ -91,13 +125,13 @@ services:
 <server>
   <id>nexus-releases</id>
   <username>admin</username>
-  <password>admin123</password>
+  <password>123456</password>
 </server>
 
 <server>
   <id>nexus-snapshots</id>
   <username>admin</username>
-  <password>admin123</password>
+  <password>123456</password>
 </server>
 
 ```
@@ -179,7 +213,7 @@ mvn deploy:deploy-file
     <repository>
         <id>nexus</id>
         <name>Nexus Repository</name>
-        <url>http://127.0.0.1:8081/repository/maven-public/</url>
+        <url>http://192.168.198.130/repository/maven-public/</url>
         <snapshots>
             <enabled>true</enabled>
         </snapshots>
@@ -192,7 +226,7 @@ mvn deploy:deploy-file
     <pluginRepository>
         <id>nexus</id>
         <name>Nexus Plugin Repository</name>
-        <url>http://127.0.0.1:8081/repository/maven-public/</url>
+        <url>http://192.168.198.130/repository/maven-public/</url>
         <snapshots>
             <enabled>true</enabled>
         </snapshots>
