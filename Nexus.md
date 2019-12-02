@@ -215,7 +215,7 @@ mvn deploy:deploy-file
     <repository>
         <id>nexus</id>
         <name>Nexus Repository</name>
-        <url>http://192.168.198.130/repository/maven-public/</url>
+        <url>http://192.168.75.131:8088/repository/maven-public/</url>
         <snapshots>
             <enabled>true</enabled>
         </snapshots>
@@ -228,7 +228,7 @@ mvn deploy:deploy-file
     <pluginRepository>
         <id>nexus</id>
         <name>Nexus Plugin Repository</name>
-        <url>http://192.168.198.130/repository/maven-public/</url>
+        <url>http://192.168.75.131:8088/repository/maven-public/</url>
         <snapshots>
             <enabled>true</enabled>
         </snapshots>
