@@ -45,7 +45,10 @@ services:
 因为是docker安装的所以要从docker进入容器里边
 
 ```shell
-`#查询容器id``docker ps` `#进入容器里面``docker exec -it 容器id bash`
+#查询容器id
+$ docker ps 
+#进入容器里面
+$ docker exec -it 容器id bash
 ```
 
  找到admin.password文件，默认位置在
@@ -58,8 +61,8 @@ services:
 
 步骤九：查看密码
 
-```
-`vi admin.password`
+```shell
+$ vi admin.password
 ```
 
 　　![img](https://img2018.cnblogs.com/blog/1697935/201907/1697935-20190708233415295-859023067.png)
@@ -179,9 +182,8 @@ Snapshot: 1.0.0-SNAPSHOT
 
 ### 4.3 部署到仓库
 
-```xml
+```shell
 mvn deploy
-
 ```
 
 ### 4.4 上传第三方 JAR 包
