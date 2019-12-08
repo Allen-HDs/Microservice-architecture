@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="adb43369-b21c-474c-9d2a-688f7dcd80d9" name="Default" comment="change name" />
+    <list default="true" id="adb43369-b21c-474c-9d2a-688f7dcd80d9" name="Default" comment="change name">
+      <change beforePath="$PROJECT_DIR$/hello-spring-cloud-web-admin-feign/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/hello-spring-cloud-web-admin-feign/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hello-spring-cloud-web-admin-feign/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/hello-spring-cloud-web-admin-feign/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spring-cloud-config" beforeDir="false" afterPath="$PROJECT_DIR$/spring-cloud-config" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +39,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/spring-cloud-config" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="HighlightingSettingsPerFile">
@@ -55,12 +59,6 @@
         <option name="vmOptionsForImporter" value="-Xmx768m" />
       </MavenImportingSettings>
     </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="313" />
-    <option name="y" value="90" />
-    <option name="width" value="1400" />
-    <option name="height" value="998" />
   </component>
   <component name="ProjectId" id="1UgJj6THmtlxkI81iZs4vkAJrpQ" />
   <component name="ProjectInspectionProfilesVisibleTreeState">
@@ -115,7 +113,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="jdk.selected.JAVA_MODULE" value="jdk8" />
-    <property name="last_opened_file_path" value="E:/Git/Git/bin/git.exe" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/spring-cloud-config/respo" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -133,6 +131,7 @@
       <recent name="com.gtstar.hello.spring.cloud.service.admin.controller" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Allen\Desktop\微服务架构\code\hello-spring-cloud\spring-cloud-config\respo" />
       <recent name="C:\Users\gtstar\Desktop\微服务架构\hello-spring-cloud\hello-spring-cloud-web-admin-ribbon\src\main\resources" />
       <recent name="C:\Users\gtstar\Desktop\微服务架构\hello-spring-cloud\hello-spring-cloud-web-admin-ribbon\src\main\java\com\gtstar\hello\spring\cloud\web\admin\ribbon" />
       <recent name="C:\Users\gtstar\Desktop\微服务架构\hello-spring-cloud\hello-spring-cloud-service-admin\src\main\resources" />
@@ -283,7 +282,7 @@
   <component name="ServiceViewManager">
     <option name="allServicesViewState">
       <serviceView>
-        <option name="contentProportion" value="0.1969112" />
+        <option name="contentProportion" value="0.23706564" />
         <treeState>
           <expand>
             <path>
@@ -311,7 +310,7 @@
       <workItem from="1575772447453" duration="4928000" />
       <workItem from="1575777440170" duration="725000" />
       <workItem from="1575778217476" duration="1796000" />
-      <workItem from="1575798455423" duration="5310000" />
+      <workItem from="1575798455423" duration="6949000" />
     </task>
     <task id="LOCAL-00001" summary="修改代码">
       <created>1575809204602</created>
