@@ -27,6 +27,8 @@
 		<!-- Spring Settings -->
 		<spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
 		<zipkin.version>2.10.1</zipkin.version>
+		<spring-boot-admin-server>2.0.1</spring-boot-admin-server>
+		<spring-boot-admin-client>2.0.1</spring-boot-admin-client>
 	</properties>
 
 	<dependencyManagement>
@@ -53,6 +55,16 @@
 				<groupId>io.zipkin.java</groupId>
 				<artifactId>zipkin-autoconfigure-ui</artifactId>
 				<version>${zipkin.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-starter-server</artifactId>
+				<version>${spring-boot-admin-server}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-starter-client</artifactId>
+				<version>${spring-boot-admin-client}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
