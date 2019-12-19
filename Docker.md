@@ -2499,3 +2499,130 @@ bc49c9de4cdf        mysql:latest        "docker-entrypoint..."   4 minutes ago  
 使用客户端工具连接 MySQL
 
 ![img](https://www.funtl.com/assets/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20171103184144.png)
+
+## 4. Docker 常用命令
+
+### 4.1 查看 Docker 版本
+
+```shell
+$ docker version
+
+```
+
+### 4.2 从 Docker 文件构建 Docker 映像
+
+```shell
+$ docker build -t image-name docker-file-location
+
+```
+
+### 4.3 运行 Docker 映像
+
+```shell
+$ docker run -d image-name
+
+```
+
+### 4.4 查看可用的 Docker 映像
+
+```shell
+$ docker images
+
+```
+
+### 4.5 查看最近的运行容器
+
+```shell
+$ docker ps -l
+
+```
+
+### 4.6 查看所有正在运行的容器
+
+```shell
+$ docker ps -a
+
+```
+
+### 4.7 停止运行容器
+
+```shell
+$ docker stop container_id
+
+```
+
+### 4.8 删除一个镜像
+
+```shell
+$ docker rmi image-name
+
+```
+
+### 4.9 删除所有镜像
+
+```shell
+$ docker rmi $(docker images -q)
+
+```
+
+### 4.10 强制删除所有镜像
+
+```shell
+$ docker rmi -r $(docker images -q)
+
+```
+
+### 4.11 删除所有虚悬镜像
+
+```shell
+$ docker rmi $(docker images -q -f dangling=true)
+
+```
+
+### 4.12 删除所有容器
+
+```shell
+$ docker rm $(docker ps -a -q)
+
+```
+
+### 4.13 进入 Docker 容器
+
+```shell
+$ docker exec -it container-id /bin/bash
+
+```
+
+### 4.14 查看所有数据卷
+
+```shell
+$ docker volume ls
+
+```
+
+### 4.15 删除指定数据卷
+
+```shell
+$ docker volume rm [volume_name]
+
+```
+
+### 4.16 删除所有未关联的数据卷
+
+```shell
+$ docker volume rm $(docker volume ls -qf dangling=true)
+
+```
+
+### 4.17 从主机复制文件到容器
+
+```shell
+$ sudo docker cp host_path containerID:container_path
+
+```
+
+### 4.18 从容器复制文件到主机
+
+```shell
+$ sudo docker cp containerID:container_path host_path
+```

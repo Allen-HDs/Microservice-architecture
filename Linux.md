@@ -876,7 +876,7 @@ character-set-server=utf8
 collation-server=utf8_general_ci
 ```
 
-##### 配置忽略数据库大小写敏感
+### 8.6 配置忽略数据库大小写敏感
 
 在 `[mysqld]` 节点底部增加如下配置
 
