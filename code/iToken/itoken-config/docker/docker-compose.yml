@@ -1,0 +1,8 @@
+version: '3.1'
+services:
+  itoken-config:
+    restart: always
+    container_name: itoken-config
+    image: 192.168.75.129:5000/itoken-config
+    ports:
+      - 8888:8888
