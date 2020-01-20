@@ -1289,21 +1289,17 @@ ADD ubuntu-xenial-core-cloudimg-amd64-root.tar.gz /
 
 如果使用 `shell` 格式的话，实际的命令会被包装为 `sh -c` 的参数的形式进行执行。比如：
 
-```
+```dockerfile
 CMD echo $HOME
 
 ```
 
-1
-
 在实际执行中，会将其变更为：
 
-```
+```dockerfile
 CMD [ "sh", "-c", "echo $HOME" ]
 
 ```
-
-1
 
 这就是为什么我们可以使用环境变量的原因，因为这些环境变量会被 shell 进行解析处理。
 
@@ -1313,12 +1309,10 @@ Docker 不是虚拟机，容器中的应用都应该以前台执行，而不是�
 
 一些初学者将 `CMD` 写为：
 
-```
+```dockerfile
 CMD service nginx start
 
 ```
-
-1
 
 然后发现容器执行后就立即退出了。甚至在容器内去使用 `systemctl` 命令结果却发现根本执行不了。这就是因为没有搞明白前台、后台的概念，没有区分容器和虚拟机的差异，依旧在以传统虚拟机的角度去理解容器。
 
