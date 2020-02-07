@@ -10,6 +10,7 @@
         <relativePath>../itoken-dependencies/pom.xml</relativePath>
     </parent>
 
+
     <artifactId>itoken-eureka</artifactId>
     <packaging>jar</packaging>
     <name>itoken-eureka</name>
