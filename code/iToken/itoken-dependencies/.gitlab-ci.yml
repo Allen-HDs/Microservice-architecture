@@ -1,0 +1,6 @@
+stages:
+  - build
+build:
+  stage: build
+  script:
+    - /usr/local/maven/apache-maven-3.6.3/bin/mvn clean deploy
