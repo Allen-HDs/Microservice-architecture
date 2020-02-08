@@ -5,3 +5,4 @@ spring:
       name: itoken-zipkin,itoken-common-eureka,itoken-common-admin,itoken-common-zipkin
       label: master
       profile: prod
+      
