@@ -2,6 +2,6 @@ spring:
   cloud:
     config:
       uri: http://192.168.198.135:8888
-      name: itoken-zuul
+      name: itoken-zuul,itoken-common-eureka,itoken-common-admin,itoken-common-zipkin
       label: master
       profile: prod
