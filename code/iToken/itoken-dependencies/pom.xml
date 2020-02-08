@@ -32,7 +32,7 @@
         <zipkin.version>2.10.1</zipkin.version>
         <lombok.version>1.16.18</lombok.version>
         <nekohtml.version>1.9.22</nekohtml.version>
-        <jackson.version>2.9.6</jackson.version>
+        <jackson.version>2.9.10.1</jackson.version>
     </properties>
 
     <dependencyManagement>
