@@ -2,6 +2,6 @@ spring:
   cloud:
     config:
       uri: http://localhost:8888
-      name: itoken-common-servcie,itoken-service-admin
+      name: itoken-common-servcie,itoken-service-admin,itoken-common-eureka,itoken-common-zipkin,itoken-common-admin
       profile: dev
       label: master
