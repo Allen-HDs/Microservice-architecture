@@ -1,7 +1,0 @@
-spring:
-  cloud:
-    config:
-      uri: http://192.168.198.135:8888
-      name: itoken-admin,itoken-common-eureka,itoken-common-zipkin
-      profile: prod
-      label: master

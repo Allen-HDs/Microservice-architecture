@@ -1,7 +1,0 @@
-spring:
-  cloud:
-    config:
-      uri: http://localhost:8888
-      name: itoken-zipkin,itoken-common-eureka,itoken-common-admin
-      label: master
-      profile: dev
